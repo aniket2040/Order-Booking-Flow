@@ -9,7 +9,7 @@ uvicorn[standard]
 # Database
 # ==========================================================
 
-sqlalchemy
+sqlalchemy[asyncio]
 asyncpg
 alembic
 
