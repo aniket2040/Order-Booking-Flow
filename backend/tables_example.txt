@@ -1,0 +1,360 @@
+Category
+Category
+
+| Column      | Type         | Constraints      |
+| ----------- | ------------ | ---------------- |
+| category_id | UUID         | PK               |
+| name        | VARCHAR(100) | UNIQUE, NOT NULL |
+| description | TEXT         | NULL             |
+| is_active   | BOOLEAN      | DEFAULT TRUE     |
+| created_at  | TIMESTAMP    | NOT NULL         |
+
+Indexes
+
+UNIQUE(name)
+
+
+Product
+
+| Column      | Type         | Constraints  |
+| ----------- | ------------ | ------------ |
+| product_id  | UUID         | PK           |
+| category_id | UUID         | FK Category  |
+| name        | VARCHAR(200) | NOT NULL     |
+| brand       | VARCHAR(100) | NULL         |
+| description | TEXT         | NULL         |
+| is_active   | BOOLEAN      | DEFAULT TRUE |
+| created_at  | TIMESTAMP    | NOT NULL     |
+| updated_at  | TIMESTAMP    | NOT NULL     |
+
+Indexes
+
+INDEX(category_id)
+
+INDEX(name)
+
+INDEX(brand)
+
+
+ProductVariant
+
+| Column     | Type          |
+| ---------- | ------------- |
+| variant_id | UUID          |
+| product_id | UUID          |
+| sku        | VARCHAR(50)   |
+| color      | VARCHAR(50)   |
+| size       | VARCHAR(50)   |
+| price      | DECIMAL(10,2) |
+| weight     | DECIMAL(8,2)  |
+| is_active  | BOOLEAN       |
+| created_at | TIMESTAMP     |
+| updated_at | TIMESTAMP     |
+
+
+Constraints
+
+PK variant_id
+
+FK product_id
+
+UNIQUE(sku)
+-----------------------------------------
+
+Inventory
+
+| Column          | Type      |
+| --------------- | --------- |
+| inventory_id    | UUID      |
+| variant_id      | UUID      |
+| available_stock | INTEGER   |
+| reserved_stock  | INTEGER   |
+| reorder_level   | INTEGER   |
+| updated_at      | TIMESTAMP |
+
+
+Constraints
+
+PK inventory_id
+
+FK variant_id
+
+UNIQUE(variant_id)
+
+CHECK(available_stock >=0)
+
+CHECK(reserved_stock>=0)
+
+-------------------------------------------
+
+
+Customer
+
+| Column      | Type         |
+| ----------- | ------------ |
+| customer_id | UUID         |
+| full_name   | VARCHAR(150) |
+| email       | VARCHAR(255) |
+| phone       | VARCHAR(20)  |
+| created_at  | TIMESTAMP    |
+
+
+Indexes
+
+UNIQUE(email)
+
+UNIQUE(phone)
+
+---------------------------------------------------
+
+CustomerAddress
+
+| Column        | Type         |
+| ------------- | ------------ |
+| address_id    | UUID         |
+| customer_id   | UUID         |
+| address_line1 | VARCHAR(255) |
+| address_line2 | VARCHAR(255) |
+| city          | VARCHAR(100) |
+| state         | VARCHAR(100) |
+| country       | VARCHAR(100) |
+| postal_code   | VARCHAR(20)  |
+| is_default    | BOOLEAN      |
+
+----------------------------------------------------
+
+ConversationSession
+
+| Column           | Type      |
+| ---------------- | --------- |
+| session_id       | UUID      |
+| customer_id      | UUID      |
+| current_state    | ENUM      |
+| status           | ENUM      |
+| started_at       | TIMESTAMP |
+| last_activity_at | TIMESTAMP |
+
+Enums
+
+ACTIVE
+
+COMPLETED
+
+EXPIRED
+
+---------------------------------------------------
+
+Workflow Enum
+
+
+DETECT_INTENT
+
+COLLECT_REQUIREMENTS
+
+VALIDATE_REQUIRED_FIELDS
+
+RESOLVE_PRODUCT
+
+CHECK_AVAILABILITY
+
+SELECT_ALTERNATIVE
+
+COLLECT_DELIVERY_DETAILS
+
+VALIDATE_ADDRESS
+
+CALCULATE_PRICING
+
+SHOW_ORDER_REVIEW
+
+WAIT_FOR_CONFIRMATION
+
+UPDATE_ORDER
+
+FINAL_VALIDATION
+
+RESERVE_INVENTORY
+
+CREATE_ORDER
+
+CREATE_PAYMENT
+
+ORDER_CONFIRMED
+
+END
+
+
+
+-----------------------------------------------
+
+
+ConversationMessage
+
+| Column     | Type      |
+| ---------- | --------- |
+| message_id | UUID      |
+| session_id | UUID      |
+| role       | ENUM      |
+| content    | TEXT      |
+| created_at | TIMESTAMP |
+
+Role
+
+USER
+
+ASSISTANT
+
+SYSTEM
+------------------------------------------------
+
+OrderDraft ⭐
+
+| Column          | Type          |
+| --------------- | ------------- |
+| draft_id        | UUID          |
+| session_id      | UUID          |
+| customer_id     | UUID          |
+| address_id      | UUID NULL     |
+| status          | ENUM          |
+| subtotal        | DECIMAL(10,2) |
+| tax             | DECIMAL(10,2) |
+| shipping_charge | DECIMAL(10,2) |
+| discount        | DECIMAL(10,2) |
+| grand_total     | DECIMAL(10,2) |
+| created_at      | TIMESTAMP     |
+| updated_at      | TIMESTAMP     |
+
+Draft Status
+
+ACTIVE
+
+CONFIRMED
+
+COMPLETED
+
+ABANDONED
+
+EXPIRED
+
+-------------------------------------------------------
+
+
+DraftItem
+
+| Column        | Type    |
+| ------------- | ------- |
+| draft_item_id | UUID    |
+| draft_id      | UUID    |
+| variant_id    | UUID    |
+| quantity      | INTEGER |
+| unit_price    | DECIMAL |
+| subtotal      | DECIMAL |
+
+Constraints
+
+CHECK(quantity>0)
+
+I also recommend:
+
+UNIQUE(draft_id,variant_id)
+
+-------------------------------------------------------
+
+
+Order
+
+| Column          | Type        |
+| --------------- | ----------- |
+| order_id        | UUID        |
+| order_number    | VARCHAR(30) |
+| customer_id     | UUID        |
+| address_id      | UUID        |
+| draft_id        | UUID NULL   |
+| status          | ENUM        |
+| subtotal        | DECIMAL     |
+| tax             | DECIMAL     |
+| shipping_charge | DECIMAL     |
+| discount        | DECIMAL     |
+| grand_total     | DECIMAL     |
+| created_at      | TIMESTAMP   |
+
+
+Status
+
+CREATED
+
+CONFIRMED
+
+PACKED
+
+SHIPPED
+
+DELIVERED
+
+CANCELLED
+------------------------------------------------------
+
+OrderItem
+| Column        | Type    |
+| ------------- | ------- |
+| order_item_id | UUID    |
+| order_id      | UUID    |
+| variant_id    | UUID    |
+| quantity      | INTEGER |
+| unit_price    | DECIMAL |
+| subtotal      | DECIMAL |
+
+-------------------------------------------------------
+
+Payment
+
+| Column     | Type      |
+| ---------- | --------- |
+| payment_id | UUID      |
+| order_id   | UUID      |
+| method     | ENUM      |
+| status     | ENUM      |
+| amount     | DECIMAL   |
+| created_at | TIMESTAMP |
+
+
+---------------------------------------------------------
+
+Shipment
+
+| Column                 | Type    |
+| ---------------------- | ------- |
+| shipment_id            | UUID    |
+| order_id               | UUID    |
+| status                 | ENUM    |
+| carrier                | VARCHAR |
+| tracking_number        | VARCHAR |
+| expected_delivery_date | DATE    |
+
+Status
+
+PENDING
+
+PACKED
+
+SHIPPED
+
+DELIVERED
+
+-------------------------------------------------------
+
+OrderStatusHistory
+
+| Parent              | Child               | Cascade  |
+| ------------------- | ------------------- | -------- |
+| Category            | Product             | RESTRICT |
+| Product             | ProductVariant      | RESTRICT |
+| ProductVariant      | Inventory           | CASCADE  |
+| Customer            | Address             | CASCADE  |
+| ConversationSession | ConversationMessage | CASCADE  |
+| ConversationSession | OrderDraft          | CASCADE  |
+| OrderDraft          | DraftItem           | CASCADE  |
+| Order               | OrderItem           | CASCADE  |
+| Order               | Payment             | CASCADE  |
+| Order               | Shipment            | CASCADE  |
+| Order               | OrderStatusHistory  | CASCADE  |

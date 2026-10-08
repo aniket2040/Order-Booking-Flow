@@ -1,0 +1,229 @@
+                                   PRODUCT DOMAIN
+══════════════════════════════════════════════════════════════════════════════
+
+Category
+---------
+PK category_id
+name
+description
+
+      1
+      │
+      │
+      ▼
+Product
+---------
+PK product_id
+FK category_id
+name
+description
+brand
+is_active
+
+      1
+      │
+      │
+      ▼
+ProductVariant
+--------------
+PK variant_id
+FK product_id
+sku
+color
+size
+price
+weight
+is_active
+
+      1
+      │
+      │
+      ▼
+Inventory
+--------------
+PK inventory_id
+FK variant_id (UNIQUE)
+available_stock
+reserved_stock
+updated_at
+
+
+
+══════════════════════════════════════════════════════════════════════════════
+                              CUSTOMER DOMAIN
+══════════════════════════════════════════════════════════════════════════════
+
+Customer
+---------
+PK customer_id
+name
+email
+phone
+
+      1
+      │
+      │
+      ▼
+CustomerAddress
+----------------
+PK address_id
+FK customer_id
+address_line1
+address_line2
+city
+state
+country
+postal_code
+is_default
+
+
+
+══════════════════════════════════════════════════════════════════════════════
+                           CONVERSATION DOMAIN
+══════════════════════════════════════════════════════════════════════════════
+
+ConversationSession
+-------------------
+PK session_id
+FK customer_id
+current_state
+status
+started_at
+last_activity_at
+
+      1
+      │
+      │
+      ▼
+ConversationMessage
+-------------------
+PK message_id
+FK session_id
+role
+content
+created_at
+
+      1
+      │
+      │
+      ▼
+OrderDraft
+-------------------
+PK draft_id
+FK session_id (UNIQUE)
+FK customer_id
+FK address_id (NULLABLE)
+
+status
+subtotal
+tax
+shipping_charge
+discount
+grand_total
+
+created_at
+updated_at
+
+      1
+      │
+      │
+      ▼
+DraftItem
+-------------------
+PK draft_item_id
+FK draft_id
+FK variant_id
+
+quantity
+unit_price
+subtotal
+
+
+
+══════════════════════════════════════════════════════════════════════════════
+                              ORDER DOMAIN
+══════════════════════════════════════════════════════════════════════════════
+
+Order
+---------
+PK order_id
+FK customer_id
+FK address_id
+FK draft_id (optional audit)
+
+order_number
+status
+subtotal
+tax
+shipping_charge
+discount
+grand_total
+
+created_at
+
+      1
+      │
+      │
+      ▼
+OrderItem
+------------
+PK order_item_id
+FK order_id
+FK variant_id
+
+quantity
+unit_price
+subtotal
+
+      │
+      │
+      ▼
+ProductVariant
+
+
+
+══════════════════════════════════════════════════════════════════════════════
+                             PAYMENT DOMAIN
+══════════════════════════════════════════════════════════════════════════════
+
+Payment
+------------
+PK payment_id
+FK order_id (UNIQUE)
+
+method
+status
+amount
+
+created_at
+
+
+
+══════════════════════════════════════════════════════════════════════════════
+                             SHIPPING DOMAIN
+══════════════════════════════════════════════════════════════════════════════
+
+Shipment
+------------
+PK shipment_id
+FK order_id (UNIQUE)
+
+status
+expected_delivery_date
+tracking_number
+carrier
+
+
+
+══════════════════════════════════════════════════════════════════════════════
+                              HISTORY DOMAIN
+══════════════════════════════════════════════════════════════════════════════
+
+OrderStatusHistory
+-------------------
+PK history_id
+FK order_id
+
+status
+remarks
+created_at
